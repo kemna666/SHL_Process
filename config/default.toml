@@ -1,0 +1,19 @@
+#缺少参数，暂时无法使用
+
+[dataset]
+name = "SHL"
+batch_size = 32
+file_path = 
+label_path = 
+test_file_path =
+[model]
+name = "GoogleNet"
+[config]
+mode = "train"
+input_dim = 
+hidden_dim = 
+output_dim = 
+optim = "Adam"
+lr = 0.001
+epochs = 100
+
