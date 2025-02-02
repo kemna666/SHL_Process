@@ -31,9 +31,9 @@ class model:
     #加载数据
     def load_data(self):
         if self.args.dataset == 'SHL':
-            self.train_dataset = SHL(self.args.train_path)
-            self.valid_dataset = SHL(self.args.valid_path)
-            self.test_dataset = SHL(self.args.test_path)
+            self.train_dataset = SHL(mode='train',file_path=self.args.train_file_path,label_path=self.args.train_label_path)
+            self.valid_dataset = SHL(mode='vaild',file_path=self.args.valid_file_path,label_path=self.args.valid_label_path)
+            self.test_dataset = SHL(mode='test',file_path=self.args.test_file_path)
             self.train_loader = DataLoader(self.train_dataset, batch_size=self.args.batch_size, shuffle=True)
             self.valid_loader = DataLoader(self.valid_dataset, batch_size=self.args.batch_size, shuffle=False)
             self.test_loader = DataLoader(self.test_dataset, batch_size=self.args.batch_size, shuffle=False)
@@ -70,34 +70,31 @@ class model:
             raise EnvironmentError('没有损失函数')
     #开始训练
     def train(self):
-        model.train()
+        self.model.train()
         running_loss = 0.0
-        for batch_idx, (inputs, targets) in enumerate(self.train_loader):
-            '''
-            缺少代码：
-            将数据加载到设备
-            inputs, targets = inputs.to(self.device), targets.to(self.device)
-            '''
-            self.optim.zero_grad()
+        for epoch in range(self.args.epochs):
+            for batch_idx, (inputs, targets) in enumerate(self.train_loader):
+                inputs.to(self.device), targets.to(self.device)
+                self.optim.zero_grad()
 
-            if self.args.model == 'googlenet':
-                outputs, aux1, aux2 = self.model(inputs).to(self.device)
-                # 计算多损失（主损失 + 辅助损失）
-                loss_main = self.criterion(outputs, targets)
-                loss_aux1 = self.criterion(aux1, targets)
-                loss_aux2 = self.criterion(aux2, targets)
-                loss = loss_main + 0.3 * loss_aux1 + 0.3 * loss_aux2 
-            else:
-                outputs = self.model(inputs).to(self.device)
-                loss = self.criterion(outputs, targets)
-            # Backward
-            loss.backward()
-            self.optim.step()
-            running_loss += loss.item()
-            if batch_idx % 100 == 99:  # 每100个batch打印一次
-                print(f'Epoch: {epoch}, Batch: {batch_idx+1}, Loss: {running_loss/100:.3f}')
-                running_loss = 0.0
-        scheduler.step()
+                if self.args.model == 'googlenet':
+                    outputs, aux1, aux2 = self.model(inputs).to(self.device)
+                    # 计算多损失（主损失 + 辅助损失）
+                    loss_main = self.criterion(outputs, targets)
+                    loss_aux1 = self.criterion(aux1, targets)
+                    loss_aux2 = self.criterion(aux2, targets)
+                    loss = loss_main + 0.3 * loss_aux1 + 0.3 * loss_aux2 
+                else:
+                    outputs = self.model(inputs).to(self.device)
+                    loss = self.criterion(outputs, targets)
+                # Backward
+                loss.backward()
+                self.optim.step()
+                running_loss += loss.item()
+                if batch_idx % 10 == 9:  # 每10个batch打印一次
+                    print(f'Epoch: {epoch}, Batch: {batch_idx+1}, Loss: {running_loss/100:.3f}')
+                    running_loss = 0.0
+            scheduler.step()
     def vaild(self):
         self.model.eval()
         correct = 0
@@ -119,7 +116,7 @@ class model:
     
     #用于测试的函数
     def test(self):
-        model.eval()
+        self.model.eval()
         correct = 0
         total = 0
         with torch.no_grad():

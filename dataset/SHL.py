@@ -5,7 +5,7 @@ from torch.utils.data import Dataset
 
 
 class SHLDataset(Dataset):
-    def __init__(self, mode,transform=None):
+    def __init__(self,mode,file_path,label_path=None,transform=None):
         self.mode = mode
         self.transform = transform
         if mode == 'train':

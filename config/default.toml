@@ -1,19 +1,18 @@
 #缺少参数，暂时无法使用
 
 [dataset]
-name = "SHL"
+dataset = "SHL"
 batch_size = 32
-file_path = 
-label_path = 
-test_file_path =
+train_file_path = "./data/npy_data/train/data.npy" 
+train_label_path = "./data/npy_data/train/label.npy"
+test_file_path = "./data/npy_data/test/data.npy"
+valid_label_path = "./data/npy_data/valid/label.npy"
+valid_file_path = "./data/npy_data/valid/data.npy"
 [model]
-name = "GoogleNet"
+model = "GoogleNet"
 [config]
-mode = "train"
-input_dim = 
-hidden_dim = 
-output_dim = 
 optim = "Adam"
+criterion = "CrossEntropyLoss"
 lr = 0.001
 epochs = 100
 
